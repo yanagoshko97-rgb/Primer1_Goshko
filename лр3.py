@@ -300,13 +300,13 @@ k, T, C, L = symbols('k C T L')
 
 #пункт 1
 
-C_ost = 2000000
+C_ost = 1000000
 Am_lst = []
 C_ost_lst = []
-for i in range(16):
+for i in range(15):
   Am = (C - L)/T
-  C_ost -= Am.subs({C: 2000000, T:16, L:0})
-  Am_lst.append(round(Am.subs({C: 2000000, T:16, L:0}), 2))
+  C_ost -= Am.subs({C: 1000000, T:15, L:0})
+  Am_lst.append(round(Am.subs({C: 1000000, T:15, L:0}), 2))
   C_ost_lst.append(round(C_ost, 2))
 print('Am.lst:', C_ost_lst)
 print('C_ost_lst:', C_ost_lst)
@@ -314,13 +314,13 @@ print('C_ost_lst:', C_ost_lst)
 #пункт 2
 
 Aj = 0
-C_ost = 2000000
+C_ost = 1000000
 Am_lst_2 = []
 C_ost_lst_2 = []
-for i in range(16):
+for i in range(15):
   Am = k * 1 / T * (C - Aj)
-  C_ost -= Am.subs({C: 2000000, T:16, k:2})
-  Am_lst_2.append(round(Am.subs({C: 2000000, T:16, k:2}), 2))
+  C_ost -= Am.subs({C: 1000000, T:15, k:2})
+  Am_lst_2.append(round(Am.subs({C: 1000000, T:15, k:2}), 2))
   Aj += Am
   C_ost_lst_2.append(round(C_ost, 2))
 print('Am.lst_2:', Am_lst_2)
@@ -332,13 +332,13 @@ print('C_ost_lst_2:', C_ost_lst_2)
 from sympy import *
 k, T, C, L =symbols("k C T L")
 
-C_ost = 2000000
+C_ost = 1000000
 Am_lst = []
 C_ost_lst = []
-for i in range(16):
+for i in range(15):
   Am = (C - L) / T
-  C_ost -= Am.subs ({C:2000000, T:16, L:0})
-  Am_lst.append(round(Am.subs({C: 2000000, T:16, L:0}), 2))
+  C_ost -= Am.subs ({C:1000000, T:15, L:0})
+  Am_lst.append(round(Am.subs({C: 1000000, T:15, L:0}), 2))
   C_ost_lst.append(round(C_ost, 2))
 print('Am_lst:', Am_lst)
 print('C_ost_lst:', C_ost_lst)
@@ -346,13 +346,13 @@ print('C_ost_lst:', C_ost_lst)
 #Способ уменьшаемого остатка 
 
 Aj = 0 
-C_ost = 2000000
+C_ost = 1000000
 Am_lst_2 = []
 C_ost_lst_2 = []
-for i in range(16):
+for i in range(15):
    Am = k * 1 / T * (C - Aj)
-   C_ost -= Am.subs({C: 2000000, T:16, k:2})
-   Am_lst_2.append(round(Am.subs({C: 2000000, T:16, k:2}), 2))
+   C_ost -= Am.subs({C: 1000000, T:15, k:2})
+   Am_lst_2.append(round(Am.subs({C: 1000000, T:15, k:2}), 2))
    Aj += Am
    C_ost_lst_2.append(round(C_ost, 2))
 print('Am_lst_2:', Am_lst_2)
@@ -361,7 +361,7 @@ print('C_ost_lst_2:', C_ost_lst_2)
 #Контейнер табличного вывода 
 
 import pandas as pd
-Y = range(1, 17)
+Y = range(1, 16)
 table1 = list(zip(Y, C_ost_lst, Am_lst))
 table2 = list(zip(Y, C_ost_lst_2, Am_lst_2))
 tfame = pd.DataFrame(table1, columns = ['Y', 'C_ost_lst', 'Am_lst'])
@@ -381,8 +381,8 @@ plt.savefig('chart2.png')
 
 
 vals = Am_lst
-labels = [str(x) for x in range(1,17)]
-explode = (0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1)
+labels = [str(x) for x in range(1,16)]
+explode = (0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1)
 fig, ax = plt.subplots()
 ax.pie(
   vals, 
@@ -397,8 +397,8 @@ ax.axis("equal")
 plt.savefig('chart3.png')
 
 vals = Am_lst_2
-labels = [str(x) for x in range (1,17)]
-explode = (0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1)
+labels = [str(x) for x in range (1,16)]
+explode = (0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1)
 fig, ax = plt.subplots()
 ax.pie(
   vals,
