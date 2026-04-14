@@ -1,0 +1,74 @@
+[
+  {
+    "component_id": "CMP-001",
+    "component_type": "config",
+    "hash_ok": true,
+    "status": "OK",
+    "current_hash": "d31748f2b47cc2ee872498965cc78120df81675f0b2bf4a251d71e575eaf7cca",
+    "reference_hash": "d31748f2b47cc2ee872498965cc78120df81675f0b2bf4a251d71e575eaf7cca",
+    "checked_at": "2026-04-14T23:26:27.655741"
+  },
+  {
+    "component_id": "CMP-002",
+    "component_type": "module",
+    "hash_ok": false,
+    "status": "HASH_MISMATCH",
+    "current_hash": "12fe3b6302dd62291e01839a33a13c4814c398fa2064b91f4909d8df4377fc68",
+    "reference_hash": "2fccc561f43711d9359de4e6e78850b52d58016b89f63039ad1b134cdb0cced2",
+    "checked_at": "2026-04-14T23:26:27.655771"
+  },
+  {
+    "component_id": "CMP-008",
+    "component_type": "library",
+    "hash_ok": true,
+    "status": "OK",
+    "current_hash": "45320bcf2ba0f0ec54f8a13da628fe293d57d1dbff9b7700e3278ed8776fe16e",
+    "reference_hash": "45320bcf2ba0f0ec54f8a13da628fe293d57d1dbff9b7700e3278ed8776fe16e",
+    "checked_at": "2026-04-14T23:26:27.655782"
+  },
+  {
+    "component_id": "CMP-004",
+    "component_type": "config",
+    "hash_ok": false,
+    "status": "HASH_MISMATCH",
+    "current_hash": "7efbe7d31852bca857ac11c2ff949a70fbb2d6a6d1ec21938f6f41884c233bc8",
+    "reference_hash": "0f70b3ca7ce5091d3d2cc935bfd120a5a4fddd03dda3757e7598c8808371d270",
+    "checked_at": "2026-04-14T23:26:27.655790"
+  },
+  {
+    "component_id": "CMP-005",
+    "component_type": "module",
+    "hash_ok": true,
+    "status": "OK",
+    "current_hash": "72ced1252aeffb1e874c22f744294ad289fe3cdbd02b3082ccbc44bef2015c19",
+    "reference_hash": "72ced1252aeffb1e874c22f744294ad289fe3cdbd02b3082ccbc44bef2015c19",
+    "checked_at": "2026-04-14T23:26:27.655801"
+  },
+  {
+    "component_id": "CMP-006",
+    "component_type": "module",
+    "hash_ok": true,
+    "status": "OK",
+    "current_hash": "a1b6c57c3b4fefafeee627bd9df2278200170c15692ea6dbf9cf42b651313956",
+    "reference_hash": "a1b6c57c3b4fefafeee627bd9df2278200170c15692ea6dbf9cf42b651313956",
+    "checked_at": "2026-04-14T23:26:27.655810"
+  },
+  {
+    "component_id": "CMP-007",
+    "component_type": "library",
+    "hash_ok": false,
+    "status": "HASH_MISMATCH",
+    "current_hash": "5f758782cae1d888ec956f3801c703cd6f20f6335e796a86df6e6b7cc531b8e2",
+    "reference_hash": "ce1a5ec68d120c55c136ab53661ceb6d37282cbc1b2364f012b2c0a80960fb79",
+    "checked_at": "2026-04-14T23:26:27.655820"
+  },
+  {
+    "component_id": "CMP-008",
+    "component_type": "config",
+    "hash_ok": true,
+    "status": "OK",
+    "current_hash": "1d594e90b6540731c664af942d6027c87e51127b15b7ea0567f85affa156d920",
+    "reference_hash": "1d594e90b6540731c664af942d6027c87e51127b15b7ea0567f85affa156d920",
+    "checked_at": "2026-04-14T23:26:27.655834"
+  }
+]

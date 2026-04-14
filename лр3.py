@@ -1,4 +1,4 @@
-
+"""""
 import os
 my = os.environ['SECRET_KEY']
 print(my)
@@ -422,4 +422,197 @@ plt.savefig('chart5.jpeg')
 plt.figure()
 plt.bar(tfame['Y'], tfame2['Am_lst_2'])
 plt.savefig('chart6.png')
+"""""
+#Индивидуальная часть (проверка целостности компонентов путем сравнения хэшей)
 
+import json
+import os
+import sys
+import hashlib
+import argparse
+from datetime import datetime
+from typing import List, Dict, Any
+
+
+try:
+    import pandas as pd
+    import matplotlib.pyplot as plt
+    VISUALIZATION_AVAILABLE = True
+except ImportError:
+    VISUALIZATION_AVAILABLE = False
+    print("Предупреждение: pandas/matplotlib не установлены. Графики не будут созданы.", file=sys.stderr)
+
+# Настройки по умолчанию
+DEFAULT_HASH_SECRET = "hash_secret_demo"
+DEFAULT_DATA_FILE = "data.json"
+DEFAULT_OUTPUT_DIR = "integrity_reports"
+
+# Парсинг аргументов командной строки
+def parse_arguments():
+    parser = argparse.ArgumentParser(description="Контроль целостности компонентов (только хэш-сравнение)")
+    parser.add_argument("--config", "-c", type=str, default=DEFAULT_DATA_FILE,
+                        help=f"Путь к JSON-файлу с компонентами (по умолчанию {DEFAULT_DATA_FILE})")
+    parser.add_argument("--secret", "-s", type=str, default=DEFAULT_HASH_SECRET,
+                        help="Секрет для вычисления хэша")
+    parser.add_argument("--output-dir", "-o", type=str, default=DEFAULT_OUTPUT_DIR,
+                        help=f"Директория для сохранения отчётов и графиков")
+    parser.add_argument("--no-viz", "-nv", action="store_true", help="Отключить создание графиков")
+    return parser.parse_args()
+
+# Создание выходной папки
+def ensure_output_dir(path):
+    if not os.path.exists(path):
+        os.makedirs(path)
+
+# Генерация примера data.json при первом запуске
+def generate_example_config(filepath):
+    example_data = [
+        {"component_id": "cfg_app", "component_type": "config",
+         "content": "database.host=localhost\ndatabase.port=5432",
+         "reference_content": "database.host=localhost\ndatabase.port=5432"},
+        {"component_id": "bin_worker", "component_type": "binary",
+         "content": "#!/bin/bash\necho 'Worker started'",
+         "reference_content": "#!/bin/bash\necho 'Worker started'"},
+        {"component_id": "lib_crypto", "component_type": "library",
+         "content": "def encrypt(data): return data",
+         "reference_content": "def encrypt(data): return data"}
+    ]
+    with open(filepath, "w", encoding="utf-8") as f:
+        json.dump(example_data, f, indent=2, ensure_ascii=False)
+    print(f"[INFO] Создан пример конфигурации: {filepath}")
+
+# Загрузка компонентов из JSON с проверкой обязательных полей
+def load_components(filepath):
+    if not os.path.exists(filepath):
+        print(f"[ERROR] Файл {filepath} не найден.", file=sys.stderr)
+        sys.exit(1)
+    with open(filepath, "r", encoding="utf-8") as f:
+        data = json.load(f)
+    if not isinstance(data, list):
+        raise ValueError("Корневой элемент JSON должен быть массивом")
+    required_fields = {"component_id", "content", "reference_content"}
+    for idx, item in enumerate(data):
+        missing = required_fields - set(item.keys())
+        if missing:
+            raise KeyError(f"В элементе {idx} отсутствуют поля: {missing}")
+    return data
+
+# Вычисление SHA256 от строки с секретом
+def compute_sha256_with_secret(content, secret):
+    payload = (content + secret).encode("utf-8")
+    return hashlib.sha256(payload).hexdigest()
+
+# Основная функция проверки одного компонента 
+def check_single_component(component, secret):
+    current_hash = compute_sha256_with_secret(component["content"], secret)
+    reference_hash = compute_sha256_with_secret(component["reference_content"], secret)
+    hash_ok = (current_hash == reference_hash)
+    return {
+        "component_id": component["component_id"],
+        "component_type": component.get("component_type", "unknown"),
+        "hash_ok": hash_ok,
+        "status": "OK" if hash_ok else "HASH_MISMATCH",
+        "current_hash": current_hash,
+        "reference_hash": reference_hash,
+        "checked_at": datetime.now()
+    }
+
+# Текстовый отчёт в консоль
+def print_text_report(results):
+    total = len(results)
+    ok_count = sum(1 for r in results if r["hash_ok"])
+    fail_count = total - ok_count
+    print("\nОТЧЁТ О ПРОВЕРКЕ ЦЕЛОСТНОСТИ")
+    for r in results:
+        status_marker = "✓" if r["hash_ok"] else "✗"
+        print(f"{status_marker} {r['component_id']:20} -> {r['status']}")
+    print(f"Всего проверено: {total}")
+    print(f"Целостность подтверждена: {ok_count}")
+    print(f"Нарушений: {fail_count}")
+    if total > 0:
+        print(f"Доля нарушений: {fail_count / total * 100:.1f}%")
+
+# Визуализация результатов (графики)
+def create_visualizations(results, output_dir):
+    if not VISUALIZATION_AVAILABLE:
+        return
+    df = pd.DataFrame(results)
+    df["checked_at"] = pd.to_datetime(df["checked_at"])
+    df["status_ru"] = df["status"].map({"OK": "Норма", "HASH_MISMATCH": "Нарушение"})
+    df["incident_flag"] = (df["status"] == "HASH_MISMATCH").astype(int)
+
+    # 1. Круговая диаграмма распределения статусов
+    plt.figure(figsize=(6, 6))
+    df["status_ru"].value_counts().plot.pie(autopct="%1.1f%%", startangle=90)
+    plt.title("Общая целостность компонентов")
+    plt.ylabel("")
+    plt.tight_layout()
+    plt.savefig(os.path.join(output_dir, "status_pie.png"), dpi=100)
+    plt.close()
+
+    # 2. Столбчатая диаграмма по типам компонентов
+    if "component_type" in df.columns:
+        crosstab = pd.crosstab(df["component_type"], df["status_ru"])
+        if not crosstab.empty:
+            ax = crosstab.plot(kind="bar", figsize=(8, 5))
+            ax.set_title("Результаты проверки по типам компонентов")
+            ax.set_xlabel("Тип компонента")
+            ax.set_ylabel("Количество")
+            plt.xticks(rotation=0)
+            plt.tight_layout()
+            plt.savefig(os.path.join(output_dir, "by_type.png"), dpi=100)
+            plt.close()
+
+    # 3. График динамики нарушений во времени
+    if len(df) > 1:
+        plt.figure(figsize=(10, 4))
+        plt.plot(df["checked_at"], df["incident_flag"], marker="o", linestyle="-", color="red")
+        plt.title("Динамика нарушений целостности")
+        plt.xlabel("Время проверки")
+        plt.ylabel("Нарушение (0-норма, 1-нарушение)")
+        plt.grid(True, linestyle="--", alpha=0.7)
+        plt.tight_layout()
+        plt.savefig(os.path.join(output_dir, "timeline.png"), dpi=100)
+        plt.close()
+
+    print(f"[INFO] Графики сохранены в директорию: {output_dir}")
+
+# Главная функция: запуск проверки, отчёт, визуализация
+def run_integrity_check(config_file, secret, output_dir, disable_viz=False):
+    ensure_output_dir(output_dir)
+    if not os.path.exists(config_file):
+        generate_example_config(config_file)
+        print(f"[INFO] Отредактируйте {config_file} и запустите скрипт снова.")
+        return
+    components = load_components(config_file)
+    results = []
+    for comp in components:
+        result = check_single_component(comp, secret)
+        results.append(result)
+        print(f"[CHECK] {result['component_id']}: {result['status']}")
+    print_text_report(results)
+    # Сохраняем детальный отчёт в JSON
+    report_file = os.path.join(output_dir, f"integrity_report_{datetime.now().strftime('%Y%m%d_%H%M%S')}.json")
+    with open(report_file, "w", encoding="utf-8") as f:
+        serializable_results = []
+        for r in results:
+            r_copy = r.copy()
+            r_copy["checked_at"] = r_copy["checked_at"].isoformat()
+            serializable_results.append(r_copy)
+        json.dump(serializable_results, f, indent=2, ensure_ascii=False)
+    print(f"[INFO] Детальный отчёт сохранён: {report_file}")
+    # Визуализация, если не отключена
+    if not disable_viz and VISUALIZATION_AVAILABLE:
+        create_visualizations(results, output_dir)
+    elif disable_viz:
+        print("[INFO] Визуализация отключена пользователем.")
+
+
+if __name__ == "__main__":
+    args = parse_arguments()
+    run_integrity_check(
+        config_file=args.config,
+        secret=args.secret,
+        output_dir=args.output_dir,
+        disable_viz=args.no_viz
+    )

@@ -17,3 +17,11 @@ deploymentTarget = "cloudrun"
 
 [agent]
 expertMode = true
+
+[userenv]
+
+[userenv.shared]
+ADMIN_KEY = "flflkroirwf"
+HASH_SECRET = "rfkokrf"
+RESTORE_KEY = "foprkggvfv"
+SIGNATURE_KEY = "deravfhtvgsrvnsf"
