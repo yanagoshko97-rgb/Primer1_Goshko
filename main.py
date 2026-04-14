@@ -13,9 +13,8 @@ for i in range(5):
   C_ost -= Am.subs({C: 100000, T:5, L:0})
   Am_lst.append(round(Am.subs({C: 100000, T:5, L:0}), 2))
   C_ost_lst.append(round(C_ost, 2))
-print('Am.lst:', C_ost_lst) #Почему печатается C_ost_lst? Я опечаталась) Там должно быть Am_lst. Спасибо, что заметила ошибку, обязательно исправлю!!
-print('C_ost_lst:', C_ost_lst) #Зачем печатать дважды? Два принта делаем по шаблону
-#Вопрос 3 - как дела? Все супер!!
+print('Am.lst:', C_ost_lst) 
+print('C_ost_lst:', C_ost_lst) 
 #пункт 2
 
 Aj = 0
